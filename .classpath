@@ -1,0 +1,5 @@
+<classpath>
+  <classpathentry path="org.scala-ide.sdt.launching.SCALA_CONTAINER" kind="con"></classpathentry>
+  <classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6" kind="con"></classpathentry>
+  <classpathentry path=".target/scala-2.9.0-1/classes" kind="output"></classpathentry>
+</classpath>
