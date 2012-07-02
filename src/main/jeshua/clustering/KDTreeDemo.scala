@@ -1,4 +1,4 @@
-package me.jeshua.clustering
+package jeshua.clustering
 import scalala.tensor._
 import scalala.tensor.dense.DenseVector
 import scala.collection.mutable.ArraySeq

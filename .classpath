@@ -1,5 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-  <classpathentry path="org.scala-ide.sdt.launching.SCALA_CONTAINER" kind="con"></classpathentry>
-  <classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6" kind="con"></classpathentry>
-  <classpathentry path=".target/scala-2.9.0-1/classes" kind="output"></classpathentry>
+	<classpathentry kind="src" output=".target/scala-2.9.1/classes" path="src/main"/>
+	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/netlib-java.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/scalala_2.9.1-1.0.0.RC2-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/arpack-combo.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/com.github.scala-incubator.io/scala-io-core_2.9.1/jars/scala-io-core_2.9.1-0.2.0.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/com.github.jsuereth.scala-arm/scala-arm_2.9.1/jars/scala-arm_2.9.1-0.3.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/org.scala-tools.sbt/sbt-proguard-plugin/jars/sbt-proguard-plugin-0.0.5.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/net.sf.proguard/proguard/jars/proguard-4.4.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/org.apache.xmlgraphics/xmlgraphics-commons/jars/xmlgraphics-commons-1.4.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/commons-io/commons-io/jars/commons-io-1.3.1.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/commons-logging/commons-logging/jars/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/jfree/jcommon/jars/jcommon-1.0.16.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/jfree/jfreechart/jars/jfreechart-1.0.13.jar"/>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="output" path=".target/scala-2.9.1/classes"/>
 </classpath>

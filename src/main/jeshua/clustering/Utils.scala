@@ -1,4 +1,4 @@
-package me.jeshua.clustering
+package jeshua.clustering
 /*
  *Copyright (C) Jeshua Bratman 2012
  *              (jeshuabratman@gmail.com) 
