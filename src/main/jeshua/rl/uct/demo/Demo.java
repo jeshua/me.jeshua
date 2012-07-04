@@ -4,7 +4,6 @@ import java.util.Random;
 
 import jeshua.rl.State;
 import jeshua.rl.uct.UCT;
-import jeshua.rl.uct.UCT2;
 
 /**
  * Runs UCT on simple episodic maze.
@@ -18,15 +17,17 @@ public class Demo {
 		int sz = 5;
 		Maze maze = new Maze(Maze.randomMaze(sz, sz, rand1));   
 		maze.setCell(sz-1, sz-1, Maze.G);
-		DemoSim simReal = new DemoSim(rand1,maze);
+		DemoSim.maze = maze;
+		
+		DemoSim simReal = new DemoSim(rand1);
 		
 		// simulator for planning
 		Random rand2 = new Random();
-		DemoSim simPlan = new DemoSim(rand2,maze);
+		DemoSim simPlan = new DemoSim(rand2);
 
 		int trajectories = 5000;		
 		int depth = 50;
-		UCT2 planner = new UCT2(simPlan, trajectories, depth,
+		UCT planner = new UCT(simPlan, trajectories, depth,
 				simPlan.getDiscountFactor(), rand2);
 		planner.ucbScaler = 1;
 		State currState;		
@@ -35,7 +36,7 @@ public class Demo {
 
 		for (int timestep = 0; timestep < 200000; timestep++) {
 			currState = simReal.getState();
-			int a = planner.plan(currState);
+			int a = planner.planAndAct(currState);
 			System.out.print("Q: ");
 			for(int i = 0; i<4;i++)
 				System.out.printf("%.4f ",planner.getQ(i));

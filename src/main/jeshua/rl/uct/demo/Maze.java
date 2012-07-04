@@ -51,11 +51,11 @@ public class Maze {
 	}
 
 	public int width() {
-		return height;
+		return width;
 	}
 
 	public int height() {
-		return width;
+		return height;
 	}
 
 	public void setCell(int x, int y, int v) {

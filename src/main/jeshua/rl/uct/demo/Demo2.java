@@ -16,20 +16,21 @@ public class Demo2 {
 		
 		// "real" world
 		Random rand1 = new Random();
-		DemoSim simReal = new DemoSim(rand1,maze);
-		simReal.numActions = 2;
+		DemoSim.maze = maze;
+		DemoSim simReal = new DemoSim(rand1);
+		DemoSim.num_actions = 2;
 		
 		// simulator for planning
 		Random rand2 = new Random();
-		DemoSim simPlan = new DemoSim(rand2,maze);
-		simPlan.numActions = 2;
+		DemoSim simPlan = new DemoSim(rand2);
+		DemoSim.num_actions = 2;
 
 		int trajectories = 200;
 		int depth = 4;
 		UCT planner = new UCT(simPlan, trajectories, depth,
 				simPlan.getDiscountFactor(), rand2);
 		planner.ucbScaler = 1;
-		planner.plan(simReal.getState());		
+		planner.planAndAct(simReal.getState());		
 		VisualizeUCT.vis(planner);
 	}
 }

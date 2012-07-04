@@ -1,40 +1,38 @@
-package jeshua.rl.norc.pgrd;
+package jeshua.rl.pgrd;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import jeshua.rl.Simulator;
 import jeshua.rl.State;
+import jeshua.rl.pgrd.DifferentiableRewardFunction.SASTriple;
 import jeshua.rl.uct.UCT;
 import jeshua.rl.uct.UCTNodes.*;
 
-public class RewardDifferentiableUCT extends UCT implements RewardDifferentiableQPlanner {
+public class RewardDifferentiableUCT extends UCT implements DifferentiableQPlanner {
 
   protected double[][] gradQ;
   protected double[][] gradR;
-  protected double[] Q;
   protected double[] gradQtmp;
   protected int numRewardFeatures;
   protected DifferentiableRewardFunction diffRF;
 
-  public RewardDifferentiableUCT(Simulator sim, DifferentiableRewardFunction diffRF, int trajectories, int depth, double gamma,
-      Random random) {
+  public RewardDifferentiableUCT(Simulator sim, DifferentiableRewardFunction diffRF, 
+		  int trajectories, int depth, double gamma, Random random) {
     super(sim, trajectories, depth, gamma, random);
     this.diffRF = diffRF;
     this.numRewardFeatures = diffRF.numParams();
     this.gradQtmp = new double[this.numRewardFeatures];
     this.gradQ = new double[super.numActions][this.numRewardFeatures];
-    this.Q = new double[super.numActions];
     this.gradR = new double[super.maxDepth+1][this.numRewardFeatures];
   }
 
   /**
-   * Plan starting from a root state.
+   * Plan starting from given state.
    * @param state
-   *            Current state.
    * @return
    */
-  public int plan(State state) {
+  public OutputAndGradient2D evaluate(State state) {
     cache.clearHash();		
     this.rootState = state.copy();
     this.root = cache.checkout(rootState,0);
@@ -42,10 +40,13 @@ public class RewardDifferentiableUCT extends UCT implements RewardDifferentiable
       simulator.setState(state.copy());
       Arrays.fill(gradQtmp, 0);
       plan(state.copy(), root, 0);
-    }
-    return getGreedyAction();
+    }    
+    
+    OutputAndGradient2D ret = new OutputAndGradient2D();
+    ret.dy = this.gradQ;
+    ret.y = this.root.Q;    
+    return ret;
   }
-
 
 
   protected double plan(State state, UCTStateNode node, int depth) {
@@ -64,8 +65,7 @@ public class RewardDifferentiableUCT extends UCT implements RewardDifferentiable
       simulator.takeAction(action);
       // take snapshot of current state of simulator			
       State state2 = simulator.getState().copy();	 
-      double r = this.diffRF.getReward(state,action,simulator.getReward(),state2);
-
+      double r = this.diffRF.getReward(state,action,state2);
       UCTStateNode child = node.getChildNode(action, state2,depth+1);
       // calculate Q via recursion
       double q = r + gamma * plan(state2, child, depth + 1);
@@ -82,7 +82,8 @@ public class RewardDifferentiableUCT extends UCT implements RewardDifferentiable
        */
 
       //get dR from reward function object
-      this.diffRF.fillGradient(state, action, state2, gradR[depth]);
+      double[] gr = this.diffRF.getGradR(state, action, state2);
+      for(int i=0;i<numRewardFeatures;i++) gradR[depth][i] = gr[i];
       //dQ = dR + gamma * dQ
       for(int i = 0; i < gradQtmp.length; ++i) gradQtmp[i] *= gamma;
       for(int i=0;i<numRewardFeatures;i++) gradQtmp[i] += gradR[depth][i];			
@@ -101,19 +102,28 @@ public class RewardDifferentiableUCT extends UCT implements RewardDifferentiable
     }
   }
 
-  @Override
-  /**
-   * Get's the gradient of Q values for the root state.
-   */
-  public double[][] getGradQ() {
-    return gradQ;
-  }
+  //======================================================================
+  //Differentiable Function Interface
 
   @Override
-  /**
-   * Get's the Q values for the root state.
-   */
-  public double[] getQ() {
-    return Q;
+  public OutputAndGradient2D evaluate(Object state) {
+	  return evaluate((State)state);
+  }  
+  @Override
+  public int numParams() {
+	  return this.diffRF.numParams();
+  }
+  @Override
+  public void setParams(double[] theta) {
+	  this.diffRF.setParams(theta);
+  }
+  @Override
+  public double[] getParams() {
+	  return this.diffRF.getParams();
+  }
+  @Override
+  public Object generateRandomInput(Random rand) {
+	  SASTriple rt = (SASTriple)diffRF.generateRandomInput(rand);
+	  return rt.state2;
   }
 }

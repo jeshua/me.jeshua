@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import jeshua.rl.Maximizer;
+import jeshua.rl.Utils.Maximizer;
 import jeshua.rl.Simulator;
 import jeshua.rl.State;
 

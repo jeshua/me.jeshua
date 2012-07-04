@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output=".target/scala-2.9.1/classes" path="src/main"/>
-	<classpathentry kind="src" path="src/test"/>
-	<classpathentry kind="lib" path="/home/jeshua/programming/me.jeshua/lib/scalala_2.9.1-1.0.0.RC2-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="/home/jeshua/programming/me.jeshua/lib/netlib-java.jar"/>
-	<classpathentry kind="lib" path="/home/jeshua/programming/me.jeshua/lib/arpack-combo.jar"/>
-	<classpathentry kind="lib" path="/home/jeshua/programming/me.jeshua/lib/libs_amd64"/>
+	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/netlib-java.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/scalala_2.9.1-1.0.0.RC2-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/arpack-combo.jar"/>
+	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/libs_amd64"/>
 	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/com.github.scala-incubator.io/scala-io-core_2.9.1/jars/scala-io-core_2.9.1-0.2.0.jar"/>
 	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/com.github.jsuereth.scala-arm/scala-arm_2.9.1/jars/scala-arm_2.9.1-0.3.jar"/>
 	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/org.scala-tools.sbt/sbt-proguard-plugin/jars/sbt-proguard-plugin-0.0.5.jar"/>

@@ -1,10 +1,8 @@
 package jeshua.rl.uct;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
-import jeshua.rl.Maximizer;
+import jeshua.rl.Utils.Maximizer;
 import jeshua.rl.Simulator;
 import jeshua.rl.State;
 import jeshua.rl.uct.UCTNodes.*;
@@ -62,7 +60,7 @@ public class UCT {
 	 *            Current state.
 	 * @return
 	 */
-	public int plan(State state) {
+	public int planAndAct(State state) {
 		cache.clearHash();		
 		this.rootState = state.copy();
 		this.root = cache.checkout(rootState,0);
@@ -74,12 +72,10 @@ public class UCT {
 	}
 
 	/**
-	 * Get the greedy action given the current Q function. (note you must call
-	 * plan first)
-	 * 
+	 * Get the greedy action given the current Q values.
 	 * @return action index
 	 */
-	public int getGreedyAction() {
+	protected int getGreedyAction() {
 		maximizer.clear();
 		double[] Q = root.Q;
 		for (int a = 0; a < numActions; a++) {

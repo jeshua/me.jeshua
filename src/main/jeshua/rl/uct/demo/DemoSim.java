@@ -14,13 +14,13 @@ public class DemoSim implements Simulator
 	DemoState state;	
     public double slip_prob = .05;//.5;//5% chance of slipping
     public double gamma = .99;
-    public int numActions = 4;
+    public static int num_actions = 4;
     
     //maze description
-    private final int W = Maze.W;
-    private final int N = Maze.N;
-    private final int G = Maze.G;
-    private final int[][] maze_data = 
+    private static final int W = Maze.W;
+    private static final int N = Maze.N;
+    private static final int G = Maze.G;
+    private static int[][] maze_data = 
         new int[][]{
             {0,0,0,0,W,0,0,W,0,0,0,0},
             {0,N|W,N,0,0,W|N,N,W|N,N,N,W,0},
@@ -30,22 +30,15 @@ public class DemoSim implements Simulator
             {0,W,0,W,0,0,0,0,0,0,0,0}            
     };
     
-    private Maze maze;  
+    public static Maze maze = new Maze(maze_data);  
 
     private Random random;
     
     // CONSTRUCTOR and INITIALIZATION
-    public DemoSim(Random rand){
-    	this(rand,null);
-    }
-    public DemoSim(Random rand, Maze maze)
+    public DemoSim(Random rand)
     {	
-    	if(maze == null)
-    		this.maze = new Maze(maze_data);
-    	else
-    		this.maze = maze;
         this.random = rand;        
-        this.state = new DemoState(this.maze.startX(),this.maze.startY());
+        this.state = new DemoState(DemoSim.maze.startX(),DemoSim.maze.startY());
     }
     
     public void initEpisode()
@@ -91,6 +84,13 @@ public class DemoSim implements Simulator
     	}
     }
     
+    public static double getReward(DemoState st){
+    	if(DemoSim.maze.isGoal(st.x, st.y))
+    		return 1;
+    	else
+    		return 0;
+    }
+    
     @Override
     public double getReward(){
     	if(maze.isGoal(state.x,state.y)){ 
@@ -102,7 +102,7 @@ public class DemoSim implements Simulator
     
     @Override
     public int getNumActions() {        
-        return numActions;
+        return num_actions;
     }
 
     @Override
@@ -119,6 +119,7 @@ public class DemoSim implements Simulator
 	public void setState(State state) {
 		this.state = (DemoState)state;		
 	}
+	
 	
 	public void print(){
 		maze.print(state.x,state.y);
