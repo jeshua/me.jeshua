@@ -12,8 +12,8 @@ import jeshua.rl.State;
 public class DemoSim implements Simulator
 {  
 	DemoState state;	
-    public double slip_prob = .5;//5% chance of slipping
-    public double gamma = .98;
+    public double slip_prob = .05;//.5;//5% chance of slipping
+    public double gamma = .99;
     public int numActions = 4;
     
     //maze description

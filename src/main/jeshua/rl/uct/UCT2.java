@@ -24,9 +24,11 @@ public class UCT2 {
 		}		
 		public double get(State s, int d){
 			if(N.get(d).containsKey(s))
-				return N.get(d).get(s);
-			else
-				return 0;
+			  return N.get(d).get(s);
+			else{
+			    N.get(d).put(s, 0d);
+			    return 0;
+			}
 		}
 		public void add(State s, int d, double amount){			
 			HashMap<State,Double> n = N.get(d);
@@ -45,7 +47,7 @@ public class UCT2 {
 			for(int i = 0;i<numActions;i++) N.add(new StateAtDepthVal(maxDepth));
 		}
 		public double get(State s, int a, int d){return N.get(a).get(s,d);}
-		public void add(State s, int a, int d, double val){N.get(a).add(s, d, val);}
+		public void add(State s, int a, int d, double amount){N.get(a).add(s, d, amount);}
 		public void set(State s, int a, int d, double val){N.get(a).set(s, d, val);}
 	}
 	public StateActionAtDepthVal Q;
@@ -122,7 +124,7 @@ public class UCT2 {
 		}
 		return maximizer.getMaxIndex();
 	}
-
+	
 	public double getQ(int action) {
 		return Q.get(rootState,action,0);
 	}
@@ -155,7 +157,6 @@ public class UCT2 {
 	protected double plan(State state, int depth) {
 		// BASE CASES:
 		if (state.isAbsorbing()) {// end of episode
-			// System.out.println("DONE");
 			return endEpisodeValue;
 		} else if (depth >= maxDepth) {// leaf node
 			return leafValue;
@@ -163,7 +164,7 @@ public class UCT2 {
 		// UCT RECURSION:
 		else {
 			// simulate an action
-			int action = getPlanningAction(state,depth);
+			int action = ucbAction(state,depth);
 			simulator.takeAction(action);			
 			
 			// take snapshot of current reward and state of simulator
@@ -173,10 +174,10 @@ public class UCT2 {
 			// recurse to get Q estimate
 			double q = r + gamma * plan(state2, depth + 1);
 
-			// compute rolling average
-			double c = sadCount.get(state,action,depth);
+			// add to Q value rolling average
+			double c = this.getStateActionCount(state,action,depth);
 			double alpha = 1d/(c+1);
-			double oldQ = Q.get(state,action,depth);
+			double oldQ = this.getQ(state,action,depth);
 			double newQ = oldQ + alpha * (q - oldQ);
 			Q.set(state,action,depth,newQ);
 			// increment counts
@@ -187,23 +188,33 @@ public class UCT2 {
 		}
 	}
 	
+	protected int getStateActionCount(State state, int action, int depth){
+	  return (int)this.sadCount.get(state,action,depth);
+	}
+	protected int getStateCount(State state, int depth){
+	  return (int)sdCount.get(state,depth);
+	}
+	protected double getQ(State state, int action, int depth){
+	  return Q.get(state, action, depth);
+	}
+	
 	/**
-	 * Get the action at a given node using the UCB rule
+	 * Get the action at a given node using the UCB1 rule
 	 * @param node - state node at which to choose action
 	 * @return - chosen action
 	 */
-	protected int getPlanningAction(State state, int depth) {
+	protected int ucbAction(State state, int depth) {
 		maximizer.clear();
-		double numerator = Math.log(sdCount.get(state,depth));
+		double numerator = 2*Math.log(this.getStateCount(state, depth));
 
 		for (int a = 0; a < numActions; ++a) {
-			double v = Q.get(state, a, depth);
-			double c = sadCount.get(state,a,depth);
+			double q = this.getQ(state,a,depth);
+			double c = this.getStateActionCount(state,a,depth);
 			
-			if(c == 0)  v = Double.MAX_VALUE;
-			else v += ucbScaler * Math.sqrt(numerator / c);
+			if(c == 0) q = Double.MAX_VALUE;
+			else       q += this.ucbScaler * Math.sqrt(numerator / c);
 			
-			maximizer.add(v, a);
+			maximizer.add(q, a);
 		}		
 		return maximizer.getMaxIndex();
 	}

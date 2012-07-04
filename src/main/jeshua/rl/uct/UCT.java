@@ -122,7 +122,6 @@ public class UCT {
 	protected double plan(State state, UCTStateNode node, int depth) {
 		// BASE CASES:
 		if (state.isAbsorbing()) {// end of episode
-			// System.out.println("DONE");
 			return endEpisodeValue;
 		} else if (depth >= maxDepth) {// leaf node
 			return leafValue;
@@ -149,10 +148,6 @@ public class UCT {
 			double alpha = 1d/sa_count;
 			node.Q[action] += (q - node.Q[action]) * alpha;
 			
-			/*double maxQ = Double.NEGATIVE_INFINITY;
-            for(int i = 1;i<this.numActions;i++)
-                if(node.Q[i] > maxQ) maxQ = node.Q[i];
-            return maxQ;*/
 			return q;
 		}
 	}

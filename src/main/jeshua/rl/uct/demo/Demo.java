@@ -4,6 +4,7 @@ import java.util.Random;
 
 import jeshua.rl.State;
 import jeshua.rl.uct.UCT;
+import jeshua.rl.uct.UCT2;
 
 /**
  * Runs UCT on simple episodic maze.
@@ -14,8 +15,8 @@ public class Demo {
 		
 		// "real" world
 		Random rand1 = new Random();
-		int sz = 10;
-		Maze maze = new Maze(Maze.randomMaze(sz, sz, rand1));
+		int sz = 5;
+		Maze maze = new Maze(Maze.randomMaze(sz, sz, rand1));   
 		maze.setCell(sz-1, sz-1, Maze.G);
 		DemoSim simReal = new DemoSim(rand1,maze);
 		
@@ -24,8 +25,8 @@ public class Demo {
 		DemoSim simPlan = new DemoSim(rand2,maze);
 
 		int trajectories = 5000;		
-		int depth = 40;
-		UCT planner = new UCT(simPlan, trajectories, depth,
+		int depth = 50;
+		UCT2 planner = new UCT2(simPlan, trajectories, depth,
 				simPlan.getDiscountFactor(), rand2);
 		planner.ucbScaler = 1;
 		State currState;		
