@@ -6,7 +6,7 @@ import java.util.Random;
 import jeshua.rl.Simulator;
 import jeshua.rl.State;
 import jeshua.rl.uct.UCT;
-import jeshua.rl.uct.UCTStateNode;
+import jeshua.rl.uct.UCTNodes.*;
 
 public class GradientUCT extends UCT {
 

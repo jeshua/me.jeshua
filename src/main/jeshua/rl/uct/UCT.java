@@ -7,6 +7,7 @@ import java.util.Random;
 import jeshua.rl.Maximizer;
 import jeshua.rl.Simulator;
 import jeshua.rl.State;
+import jeshua.rl.uct.UCTNodes.*;
 
 /**
  * UCT Planning algorithm. Takes a simulator and search parameters, then call
@@ -14,40 +15,7 @@ import jeshua.rl.State;
  * 
  * @author Jeshua Bratman
  */
-public class UCT {
-	
-	protected class StateAtDepthVal{
-		public ArrayList<HashMap<State, Double>> N;		
-		public StateAtDepthVal(int maxDepth){
-			N = new ArrayList<HashMap<State,Double>>();
-			N.ensureCapacity(maxDepth);
-		}		
-		public double get(State s, int d){
-			if(N.contains(s))
-				return N.get(d).get(s);
-			else
-				return 0;
-		}
-		public void add(State s, int d, double amount){
-			HashMap<State,Double> n = N.get(d);
-			if(n.containsKey(s)) n.put(s, n.get(s) + amount);
-			else n.put(s, amount);
-		}
-	}
-	
-	protected class StateActionAtDepthVal{
-		public ArrayList<StateAtDepthVal> N;
-		public StateActionAtDepthVal(int maxDepth, int numActions){
-			N = new ArrayList<StateAtDepthVal>();			
-			for(int i = 0;i<numActions;i++) N.add(new StateAtDepthVal(maxDepth));
-		}
-		public double get(State s, int a, int d){return N.get(a).get(s,d);}
-		public void add(State s, int a, int d, double val){N.get(a).add(s, d, val);}
-	}
-	public StateActionAtDepthVal Q;
-	public StateActionAtDepthVal Nsd;
-	public StateAtDepthVal Ns;
-	
+public class UCT {	
 	// this is the C value for UCB:
 	public double ucbScaler = 1;
 	// default value at leave of tree
@@ -83,12 +51,8 @@ public class UCT {
 		this.gamma = gamma;
 		this.simulator = sim;
 		this.numActions = sim.getNumActions();
-		this.cache = new UCTNodeStore(this.numActions);
-		this.root = null;
-		
-		this.Q = new StateActionAtDepthVal(maxDepth,numActions);
-		this.Nsd = new StateActionAtDepthVal(maxDepth,numActions);
-		this.Ns = new StateAtDepthVal(maxDepth);		
+		this.cache = new UCTNodes.UCTNodeStore(this.numActions);
+		this.root = null;	
 	}
 
 	/**
@@ -172,55 +136,47 @@ public class UCT {
 			// take snapshot of current reward and state of simulator
 			double r = simulator.getReward();
 			State state2 = simulator.getState().copy();
-
 			UCTStateNode child = node.getChildNode(action, state2,depth+1);
-			// calculate Q via recursion
+			
+			// recurse to get sample of Q
 			double q = r + gamma * plan(state2, child, depth + 1);
 
+			//update counts
 			node.sCount++;
 			int sa_count = ++node.saCounts[action];
-			// compute rolling average
-			node.Q[action] += (q - node.Q[action]) / sa_count;
-			return q;
+			
+			// compute rolling average for Q
+			double alpha = 1d/sa_count;
+			node.Q[action] += (q - node.Q[action]) * alpha;
+			
 			/*double maxQ = Double.NEGATIVE_INFINITY;
             for(int i = 1;i<this.numActions;i++)
                 if(node.Q[i] > maxQ) maxQ = node.Q[i];
             return maxQ;*/
+			return q;
 		}
 	}
 
-	
-	/**
-	 * Update the Q function estimate at a node.
-	 */
-	//protected void updateValue()
-	
-	
 	/**
 	 * Get the action at a given node using the UCB rule
 	 * @param node - state node at which to choose action
 	 * @return - chosen action
 	 */
 	protected int getPlanningAction(UCTStateNode node) {
-		if (node == null)
-			return random.nextInt(numActions);
+		if (node == null) return random.nextInt(numActions);
 		else {
 			maximizer.clear();
-
-			double numerator = 0;
-			numerator = Math.log(node.sCount);
-
+			double numerator = Math.log(node.sCount);
 			for (int a = 0; a < numActions; ++a) {
 				double val = node.Q[a];
-				if (node.saCounts[a] == 0)
-					val = Double.MAX_VALUE;
-				else
-					val += ucbScaler * Math.sqrt(numerator / node.saCounts[a]);
+				//if this action has never been tried, give it max_value
+				if (node.saCounts[a] == 0) val = Double.MAX_VALUE;
+				//otherwise use UCB1 rule
+				else val += ucbScaler * Math.sqrt(numerator / node.saCounts[a]);
 
 				maximizer.add(val, a);
 			}
-			int mx = maximizer.getMaxIndex();
-			return mx;
+			return maximizer.getMaxIndex();			
 		}
 	}
 }

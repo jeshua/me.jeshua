@@ -23,7 +23,7 @@ public class UCT2 {
 			for(int d=0;d<maxDepth;d++) N.add(new HashMap<State,Double>());
 		}		
 		public double get(State s, int d){
-			if(N.contains(s))
+			if(N.get(d).containsKey(s))
 				return N.get(d).get(s);
 			else
 				return 0;
@@ -170,21 +170,20 @@ public class UCT2 {
 			double r = simulator.getReward();
 			State state2 = simulator.getState().copy();
 
-			// calculate Q via recursion
+			// recurse to get Q estimate
 			double q = r + gamma * plan(state2, depth + 1);
 
-			sdCount.add(state,depth,1);
-			
-			double c = sadCount.get(state,action,depth);
-			sadCount.set(state,action,depth,c+1);	
 			// compute rolling average
+			double c = sadCount.get(state,action,depth);
+			double alpha = 1d/(c+1);
 			double oldQ = Q.get(state,action,depth);
-			Q.set(state,action,depth,(q - oldQ) / c);			
+			double newQ = oldQ + alpha * (q - oldQ);
+			Q.set(state,action,depth,newQ);
+			// increment counts
+			sdCount.add(state,depth,1);
+			sadCount.set(state,action,depth,c+1);
+			
 			return q;
-			/*double maxQ = Double.NEGATIVE_INFINITY;
-            for(int i = 1;i<this.numActions;i++)
-                if(node.Q[i] > maxQ) maxQ = node.Q[i];
-            return maxQ;*/
 		}
 	}
 	
@@ -194,25 +193,19 @@ public class UCT2 {
 	 * @return - chosen action
 	 */
 	protected int getPlanningAction(State state, int depth) {
-		if (state == null)
-			return random.nextInt(numActions);
-		else {
-			maximizer.clear();
+		maximizer.clear();
+		double numerator = Math.log(sdCount.get(state,depth));
 
-			double numerator = 0;
-			numerator = Math.log(sdCount.get(state,depth));
-
-			for (int a = 0; a < numActions; ++a) {
-				double val = Q.get(state, a, depth);
-				double c = sadCount.get(state,a,depth);
-				if(c == 0)
-					val = Double.MAX_VALUE;
-				else
-					val += ucbScaler * Math.sqrt(numerator / c);
-				maximizer.add(val, a);
-			}
-			int mx = maximizer.getMaxIndex();
-			return mx;
-		}
+		for (int a = 0; a < numActions; ++a) {
+			double v = Q.get(state, a, depth);
+			double c = sadCount.get(state,a,depth);
+			
+			if(c == 0)  v = Double.MAX_VALUE;
+			else v += ucbScaler * Math.sqrt(numerator / c);
+			
+			maximizer.add(v, a);
+		}		
+		return maximizer.getMaxIndex();
 	}
+
 }

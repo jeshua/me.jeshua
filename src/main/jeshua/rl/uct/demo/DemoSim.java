@@ -12,8 +12,10 @@ import jeshua.rl.State;
 public class DemoSim implements Simulator
 {  
 	DemoState state;	
-    private final double slip_prob = .1;//10% chance of slipping
+    public double slip_prob = .5;//5% chance of slipping
+    public double gamma = .98;
     public int numActions = 4;
+    
     //maze description
     private final int W = Maze.W;
     private final int N = Maze.N;
@@ -105,7 +107,7 @@ public class DemoSim implements Simulator
 
     @Override
     public double getDiscountFactor() {
-        return 1;
+        return gamma;
     }
 
 	@Override

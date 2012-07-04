@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output=".target/scala-2.9.1/classes" path="src/main"/>
+	<classpathentry kind="src" path="src/test"/>
 	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/netlib-java.jar"/>
 	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/scalala_2.9.1-1.0.0.RC2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="/home/jeshua/research/me.jeshua/lib/arpack-combo.jar"/>
@@ -15,5 +16,6 @@
 	<classpathentry kind="lib" path="/home/jeshua/.ivy2/cache/jfree/jfreechart/jars/jfreechart-1.0.13.jar"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path=".target/scala-2.9.1/classes"/>
 </classpath>

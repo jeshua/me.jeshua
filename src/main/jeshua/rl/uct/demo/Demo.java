@@ -4,10 +4,9 @@ import java.util.Random;
 
 import jeshua.rl.State;
 import jeshua.rl.uct.UCT;
-import jeshua.rl.uct.UCT2;
 
 /**
- * Simple episodic maze with 10% slipping (move in random direction).
+ * Runs UCT on simple episodic maze.
  * @author Jeshua Bratman
  */
 public class Demo {
@@ -15,7 +14,7 @@ public class Demo {
 		
 		// "real" world
 		Random rand1 = new Random();
-		int sz = 5;
+		int sz = 10;
 		Maze maze = new Maze(Maze.randomMaze(sz, sz, rand1));
 		maze.setCell(sz-1, sz-1, Maze.G);
 		DemoSim simReal = new DemoSim(rand1,maze);
@@ -24,9 +23,9 @@ public class Demo {
 		Random rand2 = new Random();
 		DemoSim simPlan = new DemoSim(rand2,maze);
 
-		int trajectories = 1000;		
-		int depth = 20;
-		UCT2 planner = new UCT2(simPlan, trajectories, depth,
+		int trajectories = 5000;		
+		int depth = 40;
+		UCT planner = new UCT(simPlan, trajectories, depth,
 				simPlan.getDiscountFactor(), rand2);
 		planner.ucbScaler = 1;
 		State currState;		

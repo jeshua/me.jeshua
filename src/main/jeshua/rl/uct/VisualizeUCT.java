@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import jeshua.rl.State;
+import jeshua.rl.uct.UCTNodes.*;
 
 /**
  * Visualize the current UCT planning tree. You must have graphviz and be running linux for this to work.
@@ -44,11 +45,11 @@ public class VisualizeUCT {
 								+ "\" [label=\""+String.format("a:%d Q=%.3f",i,st.Q[i])+"\",shape=\"triangle\"]\n";
 					}
 					for (int i = 0; i < children.length; i++) {
-						if(!sdrawn.contains(st)){
+						//if(!sdrawn.contains(st)){
 							digraph += "\"" + state.toString() + "\" -> \""
 									+ children[i].toString()+"\" "							
 									+" [label=\"#"+st.saCounts[i]+"\"]\n";
-						}
+						//}
 						queue.add(children[i]);						
 					}
 					if(!sdrawn.contains(st)){ sdrawn.add(st);}
@@ -56,14 +57,14 @@ public class VisualizeUCT {
 					UCTActionNode st = ((UCTActionNode) state);
 					final UCTStateNode[] children = st.childNodes;					
 					for (int i = 0; i < st.currBranches; i++) {
-						if(!adrawn.contains(st)){
+						//if(!adrawn.contains(st)){
 							digraph += "\""+children[i].toString() + "\" [label=\"s: "+st.childStates[i].toString()+"\",shape=\"box\"]\n";
 							digraph += "\"" + state.toString() + "\" -> \""
 									+ children[i].toString()
 									//+ st.childStates[i].toString() 
 									+ "\"[label=\""
 									+ children[i].sCount + "\"]\n";
-						}
+						//}
 						queue.add(children[i]);
 					}
 					if(!adrawn.contains(st)){ adrawn.add(st);}
