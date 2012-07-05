@@ -7,12 +7,12 @@ import jeshua.rl.pgrd.DifferentiableFunction1D.OutputAndGradient1D;
 import jeshua.rl.pgrd.DifferentiableFunction2D.OutputAndGradient2D;
 
 public class ValidateGradient {
-  public static boolean validate(DifferentiableFunction1D f){
-	 return validate(f,new Random()); 
-	}
-	public static boolean validate(DifferentiableFunction1D f,Random rand){	
-		double delta = 0.01;
-		double max_diff = 0.0001;
+	public static boolean validate(DifferentiableFunction1D f)
+  	 {return validate(f,0.000001,new Random());}
+	public static boolean validate(DifferentiableFunction1D f, double threshold)
+  	 {return validate(f,threshold,new Random());}
+	public static boolean validate(DifferentiableFunction1D f,double threshold, Random rand){	
+		double delta = 0.01;		
 		int num_trials = 10;
 		
 		boolean success = true;
@@ -21,7 +21,6 @@ public class ValidateGradient {
 			double[] theta = f.getParams();
 			double[] theta1 = f.getParams().clone();
 			OutputAndGradient1D output = f.evaluate(input);
-			double y = output.y;
 			double[] dy = output.dy.clone();			
 		  if(output.logspace)
         for(int i=0;i<output.dy.length;i++)
@@ -51,8 +50,8 @@ public class ValidateGradient {
 			  numer += Math.pow(dy[i] - dy_hat[i],2);
 				denom += Math.pow(dy[i] + dy_hat[i],2);
 			}
-			double diff = numer/denom;			
-			success = success & (diff < max_diff);
+			double diff = numer/denom;
+			success = success & (diff < threshold);
 
 			//------
 			//return results
@@ -75,12 +74,12 @@ public class ValidateGradient {
 		}
 		return success;
 	}
-	public static boolean validate(DifferentiableFunction2D f){
-	 return validate(f,new Random()); 
-	}
-	public static boolean validate(DifferentiableFunction2D f,Random rand){
-		double delta = 0.0001;
-		double max_diff = 0.0001;
+	public static boolean validate(DifferentiableFunction2D f)
+	{return validate(f,0.0001,new Random());}
+	public static boolean validate(DifferentiableFunction2D f,double threshold)
+	{return validate(f,threshold,new Random());}
+	public static boolean validate(DifferentiableFunction2D f,double threshold, Random rand){
+		double delta = 0.0001;		
 		int num_trials = 10;		
 		boolean success = true;
     final double[] theta1 = f.getParams().clone();
@@ -130,7 +129,7 @@ public class ValidateGradient {
 				}
 			}
 			double diff = numer/denom;
-			success = success & (diff < max_diff);
+			success = success & (diff < threshold);
 			//------
 			//return results
 			if(!success){

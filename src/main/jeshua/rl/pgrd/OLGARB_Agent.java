@@ -2,22 +2,17 @@ package jeshua.rl.pgrd;
 
 import java.util.Random;
 
-import jeshua.rl.Simulator;
+import jeshua.rl.Agent;
 import jeshua.rl.State;
 import jeshua.rl.Utils;
 
-public class OLGARB_Agent {
+public class OLGARB_Agent implements Agent {
 	
   private DifferentiableQFunction qf;
 	private SoftmaxPolicy           policy;
 	private OLGARB                  policy_gradient;
-	
-	private DifferentiableRFunction rf;
-	public DifferentiableRFunction getRF(){return rf;}
-	
-	private int previous_action;
-	private Random random;
-	
+		
+	private Random random;	
 	
 	/**
 	 * 
@@ -34,7 +29,6 @@ public class OLGARB_Agent {
 			this.random = random;
 		 policy          = new SoftmaxPolicy(qf, temperature);
 		 policy_gradient = new OLGARB(policy,alpha,gamma,false);
-		 previous_action = -1;	
 		 this.qf = qf;
 	}
 	
@@ -45,20 +39,20 @@ public class OLGARB_Agent {
 	 * @param reward -- objective reward sample
 	 * @return chosen action
 	 */
-	public int step(State st, double reward){
-		
-		double[] mu = policy.evaluate(st).y;		
-		if(previous_action >= 0)
-			this.policy_gradient.learn(previous_action, st, reward);
-				
-		if(st.isAbsorbing()){
-		  this.policy_gradient.initEpisode();
-		  previous_action = -1;
-		} else
-		  previous_action = Utils.sampleMultinomial(mu,this.random);
-		return previous_action;
+	public int step(State st1){
+		policy.evaluate(st1);
+		return Utils.sampleMultinomial(policy.getCurrentPolicy().y,this.random);
 	}
-	
-	
-	public DifferentiableQFunction getQF(){return qf;}
+	public int step(State st1, int a1, State st2, double reward){
+		this.policy_gradient.learn(st1, a1, reward);		
+		
+		int new_action;
+		if(st2.isAbsorbing()){
+		  this.policy_gradient.initEpisode();
+		  new_action = -1;
+		} else
+		  new_action = step(st2);		
+		return new_action;
+	}		
+	public DifferentiableQFunction getQF(){return qf;}	
 }

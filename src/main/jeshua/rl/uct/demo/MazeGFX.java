@@ -19,8 +19,7 @@ public class MazeGFX
         int height = maze.height();
         int cell_width = (size.width - 1) / width;
         int cell_height = (size.height - 1) / height;
-        int box_size = Math.min(cell_width, cell_height);
-        System.out.println(width+", "+height);
+        int box_size = Math.min(cell_width, cell_height);        
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         Font font = new Font("Serif", Font.PLAIN, 35);

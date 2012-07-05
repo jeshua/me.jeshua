@@ -6,18 +6,18 @@ import java.awt.*;
 import javax.swing.*;
 
 
-import jeshua.rl.pgrd.PGRD_UCT;
+import jeshua.rl.pgrd.RewardFunction;
 import jeshua.rl.uct.demo.DemoState;
 import jeshua.rl.uct.demo.Maze;
 import jeshua.rl.uct.demo.MazeGFX;
 
-public class DemoVisualizePGRD {
+public class DemoVisualizeR {
 	JFrame frame;
 	JPanel panel;
 	Maze maze;
 	int agx;
 	int agy;
-	PGRD_UCT pgrd;
+	RewardFunction ag;
 	
 	class Canvas extends JPanel{
 		private static final long serialVersionUID = 1L;
@@ -28,19 +28,17 @@ public class DemoVisualizePGRD {
 			double[][] overlay = new double[maze.width()][maze.height()];
 			double max = Double.NEGATIVE_INFINITY;
 			double min = Double.POSITIVE_INFINITY;
-			DemoRewardFunction rf = (DemoRewardFunction)pgrd.getRF();
 			DemoState st = new DemoState(0,0);
 			for(int x=0;x<overlay.length;x++){
 				for(int y=0;y<overlay[x].length;y++){
 					st.x = x;
 					st.y = y;
-					double r = rf.getReward(null, 0, st);
+					double r = ag.getReward(null,0,st);
 					overlay[x][y] = r;
 					if(r > max)
 						max = r;
 					if(r < min)
 						min = r;
-					System.out.printf("%.2f ",overlay[x][y]);
 				}
 			}
 			for(int x=0;x<overlay.length;x++){
@@ -53,10 +51,10 @@ public class DemoVisualizePGRD {
 		}
 	}
 	
-	public DemoVisualizePGRD(Maze maze, PGRD_UCT pgrd){
+	public DemoVisualizeR(Maze maze, RewardFunction ag){
 		frame = new JFrame();
 		panel = new Canvas();
-		this.pgrd = pgrd;
+		this.ag = ag;
 		this.agx = 0;
 		this.agy = 0;
 		this.maze = maze;

@@ -2,8 +2,8 @@ package jeshua.rl.pgrd.demo;
 
 import java.util.Random;
 
+import jeshua.rl.SimpleDriver;
 import jeshua.rl.pgrd.PGRD_UCT;
-import jeshua.rl.pgrd.ValidateGradient;
 import jeshua.rl.uct.demo.*;
 
 /**
@@ -12,47 +12,34 @@ import jeshua.rl.uct.demo.*;
  */
 public class Demo {
 	public static void main(String[] args) throws InterruptedException {
-		
-				
-		// "real" world
+		// real world
 		Random rand1 = new Random();
-		int sz = 3;
+		int sz = 6;
 		Maze maze = new Maze(Maze.randomMaze(sz, sz, rand1));   
 		maze.setCell(sz-1, sz-1, Maze.G);
 		DemoSim.maze = maze;
-		
 		DemoSim simReal = new DemoSim(rand1);
 		
 		// simulator for planning
 		Random rand2 = new Random();
 		DemoSim simPlan = new DemoSim(rand2);
 		DemoRewardFunction rf = new DemoRewardFunction();
-		
-		//validate gradient
-		ValidateGradient.validate(rf);
-		
-		
-		int trajectories = 5000;		
-		int depth = 5;
-		double alpha = .01;
-		double temperature = .02;
-		double gamma = 1;
+				
+		int trajectories = 5;		
+		int depth = 1;
+		double alpha = .001;
+		double temperature = .05;
+		double gamma = .95;
 		PGRD_UCT pgrd = new PGRD_UCT(simPlan,rf,alpha,temperature,trajectories,depth,gamma,rand2);		
-		DemoState currState;
-		
-		DemoVisualizePGRD p = new DemoVisualizePGRD(DemoSim.maze,pgrd);
-		for (int timestep = 0; timestep < 200000; timestep++) {
-			currState = (DemoState)simReal.getState();
-			p.redraw(currState.x, currState.y);
-			double reward = simReal.getReward();
-			int a = pgrd.step(currState, reward);
-			simReal.takeAction(a);
-			//if(timestep > 10000)
-			{
-				simReal.print();			
+		DemoVisualizeR p = new DemoVisualizeR(DemoSim.maze,pgrd.getRF());
+		SimpleDriver driver = new SimpleDriver(simReal,pgrd);
+		for (int timestep = 0; timestep < 2000000; timestep++) {
+			driver.step();			
+			DemoState curr_state = (DemoState)driver.curr_state;
+			if(timestep > 10000 || ((timestep%30)==0)){
+				p.redraw(curr_state.x, curr_state.y);
 				Thread.sleep(10);
 			}
 		}
-
 	}
 }

@@ -11,5 +11,6 @@ public interface Simulator {
     public void takeAction(int a); 
     public int getNumActions();    
     public double getDiscountFactor();
-    public double getReward(); 			//reward at current state    
+    public double getReward(); 			//reward at current state 
+    public void initEpisode();
 }

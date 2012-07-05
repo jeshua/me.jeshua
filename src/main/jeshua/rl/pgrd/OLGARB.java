@@ -41,13 +41,15 @@ public class OLGARB {
 	  this.timestep = 0;	  
 	}
 	
-	public void learn(int previous_action, State st, double reward){
-		double[][] grad = policy.getCurrentPolicy().dy;
+	public void learn(State st1, int a1, double reward){	
+		double[] mu = policy.getCurrentPolicy().y; 
+		double[][] dmu = policy.getCurrentPolicy().dy;
+		
 		timestep++;
 		baseline += (1d/timestep) * (reward - baseline);//rolling average			
 		
 		for(int i = 0; i < num_params; ++i){
-			Z[i] = gamma * Z[i] + grad[previous_action][i];
+			Z[i] = gamma * Z[i] + dmu[a1][i]/mu[a1];
 		}
 		this.theta = this.policy.getParams().clone();
 		double delta = 0;
