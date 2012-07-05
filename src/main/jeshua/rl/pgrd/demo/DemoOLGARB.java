@@ -2,6 +2,7 @@ package jeshua.rl.pgrd.demo;
 
 import java.util.Random;
 
+import jeshua.rl.pgrd.OLGARB_Agent;
 import jeshua.rl.pgrd.PGRD_UCT;
 import jeshua.rl.pgrd.ValidateGradient;
 import jeshua.rl.uct.demo.*;
@@ -10,13 +11,13 @@ import jeshua.rl.uct.demo.*;
  * Runs PGRD UCT on simple maze.
  * @author Jeshua Bratman
  */
-public class Demo {
+public class DemoOLGARB {
 	public static void main(String[] args) throws InterruptedException {
 		
 				
 		// "real" world
 		Random rand1 = new Random();
-		int sz = 3;
+		int sz = 2;
 		Maze maze = new Maze(Maze.randomMaze(sz, sz, rand1));   
 		maze.setCell(sz-1, sz-1, Maze.G);
 		DemoSim.maze = maze;
@@ -25,31 +26,24 @@ public class Demo {
 		
 		// simulator for planning
 		Random rand2 = new Random();
-		DemoSim simPlan = new DemoSim(rand2);
-		DemoRewardFunction rf = new DemoRewardFunction();
+		DemoQFunction qf = new DemoQFunction();
 		
-		//validate gradient
-		ValidateGradient.validate(rf);
-		
-		
-		int trajectories = 5000;		
-		int depth = 5;
 		double alpha = .01;
 		double temperature = .02;
 		double gamma = 1;
-		PGRD_UCT pgrd = new PGRD_UCT(simPlan,rf,alpha,temperature,trajectories,depth,gamma,rand2);		
+		OLGARB_Agent agent = new OLGARB_Agent(qf,alpha,temperature,gamma,rand2);		
 		DemoState currState;
 		
-		DemoVisualizePGRD p = new DemoVisualizePGRD(DemoSim.maze,pgrd);
+		DemoVisualizeOG p = new DemoVisualizeOG(DemoSim.maze,agent);
 		for (int timestep = 0; timestep < 200000; timestep++) {
 			currState = (DemoState)simReal.getState();
 			p.redraw(currState.x, currState.y);
 			double reward = simReal.getReward();
-			int a = pgrd.step(currState, reward);
+			int a = agent.step(currState, reward);
 			simReal.takeAction(a);
 			//if(timestep > 10000)
 			{
-				simReal.print();			
+				//simReal.print();			
 				Thread.sleep(10);
 			}
 		}

@@ -12,7 +12,7 @@ import jeshua.rl.State;
  * @author jeshua
  *
  */
-public interface DifferentiableRewardFunction extends RewardFunction, DifferentiableFunction1D{	
+public interface DifferentiableRFunction extends RewardFunction, DifferentiableFunction1D{	
 	/**
 	 * Compute gradient of the reward function w.r.t. parameters theta for a given (s,a,s) triple.
 	 * @param state1

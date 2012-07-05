@@ -14,36 +14,47 @@ import org.junit.Test;
 public class TestGradients {
 
 	@Test
-	public void testDemoRewardFunctionGradient() {
+	public void testDemoRFunctionGradient() {
 		DemoRewardFunction rf = new DemoRewardFunction();
-		assertTrue(ValidateGradient.validate(rf));
-		
+		assertTrue(ValidateGradient.validate(rf));		
+	}
+	@Test
+	public void testDemoQFunctionGradient() {
+	  DemoQFunction qf = new DemoQFunction();
+	  assertTrue(ValidateGradient.validate(qf));	    
 	}
 	@Test
 	public void testSoftmaxGradient() {
-		Random rand = new Random();		
-		DemoSim sim = new DemoSim(rand);
-		DemoRewardFunction rf = new DemoRewardFunction();
-		int trajectories = 100000;		
-		int depth = 3;
-		double temperature = 100;
-		double gamma = 1;	
-		RewardDifferentiableUCT planner = 
-				new RewardDifferentiableUCT(sim, rf, trajectories, depth, gamma, rand);
-		SoftmaxPolicy policy = new SoftmaxPolicy(planner, temperature);
-		assertTrue(ValidateGradient.validate(policy));		
+	  DemoQFunction qf = new DemoQFunction();
+	  SoftmaxPolicy policy = new SoftmaxPolicy(qf, 10);
+	  assertTrue(ValidateGradient.validate(policy));      
 	}
+	
 	@Test
 	public void testUCTGradient() {
-		Random rand = new Random();		
+		Random rand = new Random(63403);		
 		DemoSim sim = new DemoSim(rand);
 		DemoRewardFunction rf = new DemoRewardFunction();
-		int trajectories = 100000;		
-		int depth = 3;
+		int trajectories = 20000;		
+		int depth = 5;
 		double gamma = 1;	
 		RewardDifferentiableUCT planner = 
 				new RewardDifferentiableUCT(sim, rf, trajectories, depth, gamma, rand);
-		planner.ucbScaler = 10000;
-		assertTrue(ValidateGradient.validate(planner));		
+		assertTrue(ValidateGradient.validate(planner,rand));		
 	}
+	
+	@Test
+  public void testPGRDGradient() {
+    Random rand = new Random(493);   
+    DemoSim sim = new DemoSim(rand);
+    DemoRewardFunction rf = new DemoRewardFunction();
+    int trajectories = 20000;   
+    int depth = 5;
+    double temperature = .01;
+    double gamma = 1; 
+    RewardDifferentiableUCT planner = 
+        new RewardDifferentiableUCT(sim, rf, trajectories, depth, gamma, rand);
+    SoftmaxPolicy policy = new SoftmaxPolicy(planner, temperature);
+    assertTrue(ValidateGradient.validate(policy,rand));    
+  }
 }

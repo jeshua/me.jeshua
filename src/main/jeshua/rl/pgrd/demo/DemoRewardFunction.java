@@ -3,7 +3,7 @@ package jeshua.rl.pgrd.demo;
 import java.util.Random;
 
 import jeshua.rl.State;
-import jeshua.rl.pgrd.DifferentiableRewardFunction;
+import jeshua.rl.pgrd.DifferentiableRFunction;
 import jeshua.rl.uct.demo.*;
 
 /**
@@ -15,7 +15,7 @@ import jeshua.rl.uct.demo.*;
  * @author jeshua
  *
  */
-public class DemoRewardFunction implements DifferentiableRewardFunction {
+public class DemoRewardFunction implements DifferentiableRFunction {
 	private int num_params;
 	private double[] theta;
 	private double[] dtheta;

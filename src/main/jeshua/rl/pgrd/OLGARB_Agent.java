@@ -6,9 +6,9 @@ import jeshua.rl.Simulator;
 import jeshua.rl.State;
 import jeshua.rl.Utils;
 
-public class PGRD_UCT {
+public class OLGARB_Agent {
 	
-	private RewardDifferentiableUCT planner;
+  private DifferentiableQFunction qf;
 	private SoftmaxPolicy           policy;
 	private OLGARB                  policy_gradient;
 	
@@ -21,27 +21,22 @@ public class PGRD_UCT {
 	
 	/**
 	 * 
-	 * @param sim          -- simulator to give to planner
-	 * @param rf           -- reward function
+	 * @param qf           -- q function
 	 * @param gamma        -- reward discount factor
 	 * @param alpha        -- policy gradient learning rate
 	 * @param temperature  -- softmax policy temperature
 	 * @param depth        -- uct planning depth
 	 * @param trajectories -- uct planning trajectory count
 	 */
-	public PGRD_UCT(Simulator sim, DifferentiableRFunction rf,
-			        double alpha, double temperature,
-			        int trajectories, int depth, 
+	public OLGARB_Agent(DifferentiableQFunction qf,
+			        double alpha, double temperature,			        
 			        double gamma, Random random){
 			this.random = random;
-		 planner         = new RewardDifferentiableUCT(sim, rf, trajectories, depth, gamma, random);
-		 policy          = new SoftmaxPolicy(planner, temperature);
+		 policy          = new SoftmaxPolicy(qf, temperature);
 		 policy_gradient = new OLGARB(policy,alpha,gamma,false);
-		 previous_action = -1;		
-		 this.rf = rf;
+		 previous_action = -1;	
+		 this.qf = qf;
 	}
-	
-	
 	
 	
 	/**
@@ -55,9 +50,15 @@ public class PGRD_UCT {
 		double[] mu = policy.evaluate(st).y;		
 		if(previous_action >= 0)
 			this.policy_gradient.learn(previous_action, st, reward);
-		
-		previous_action = Utils.sampleMultinomial(mu,this.random);
+				
+		if(st.isAbsorbing()){
+		  this.policy_gradient.initEpisode();
+		  previous_action = -1;
+		} else
+		  previous_action = Utils.sampleMultinomial(mu,this.random);
 		return previous_action;
 	}
 	
+	
+	public DifferentiableQFunction getQF(){return qf;}
 }

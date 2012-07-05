@@ -1,5 +1,7 @@
 package jeshua.rl.pgrd;
 
+import java.util.Arrays;
+
 import jeshua.rl.State;
 
 /**
@@ -28,29 +30,32 @@ public class OLGARB {
 		this.num_params = policy.numParams();
 		this.theta = new double[num_params];
 		this.Z = new double[num_params];
-		this.timestep = 0;
-		this.baseline = 1;
+		this.initEpisode();
 	}
 	public OLGARB(DifferentiablePolicy policy, double alpha, double gamma)
 	{this(policy,alpha,gamma,false);};    
 	
+	public void initEpisode (){	  
+	  Arrays.fill(Z, 0);
+	  this.baseline = 0;
+	  this.timestep = 0;	  
+	}
 	
 	public void learn(int previous_action, State st, double reward){
 		double[][] grad = policy.getCurrentPolicy().dy;
-		
 		timestep++;
 		baseline += (1d/timestep) * (reward - baseline);//rolling average			
 		
 		for(int i = 0; i < num_params; ++i){
 			Z[i] = gamma * Z[i] + grad[previous_action][i];
 		}
-		this.theta = this.policy.getParams();
-		double rate = 0;
-		if (use_baseline) rate = alpha * (reward-baseline);
-		else rate = alpha * reward;
+		this.theta = this.policy.getParams().clone();
+		double delta = 0;
+		if (use_baseline) delta = alpha * (reward-baseline);
+		else delta = alpha * reward;
 		
 		for(int i=0;i<num_params;i++)
-			theta[i] += rate * Z[i];
+			theta[i] += delta * Z[i];
 		policy.setParams(theta);
 	}
 }

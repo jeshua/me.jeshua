@@ -6,19 +6,27 @@ import java.util.Random;
 import jeshua.rl.pgrd.DifferentiableFunction1D.OutputAndGradient1D;
 import jeshua.rl.pgrd.DifferentiableFunction2D.OutputAndGradient2D;
 
-public class ValidateGradient {	
-	public static boolean validate(DifferentiableFunction1D f){
+public class ValidateGradient {
+  public static boolean validate(DifferentiableFunction1D f){
+	 return validate(f,new Random()); 
+	}
+	public static boolean validate(DifferentiableFunction1D f,Random rand){	
 		double delta = 0.01;
 		double max_diff = 0.0001;
-		int num_trials = 1000;		
-		Random rand = new Random();
+		int num_trials = 10;
+		
 		boolean success = true;
 		for(int trials=0;trials<num_trials;trials++){
 			Object input = f.generateRandomInput(rand);
 			double[] theta = f.getParams();
 			double[] theta1 = f.getParams().clone();
 			OutputAndGradient1D output = f.evaluate(input);
-
+			double y = output.y;
+			double[] dy = output.dy.clone();			
+		  if(output.logspace)
+        for(int i=0;i<output.dy.length;i++)
+            dy[i] = Math.exp(dy[i]);
+		  
 			//compute empirical gradient
 			double[] dy_hat = new double[theta.length];
 			Arrays.fill(dy_hat,0);
@@ -38,22 +46,24 @@ public class ValidateGradient {
 			}
 			//reset theta
 			f.setParams(theta1);
-			double diff = 0;
+			double numer=0,denom=0;
 			for(int i=0;i<theta.length;i++){			
-				diff += Math.abs(output.dy[i] - dy_hat[i]);
+			  numer += Math.pow(dy[i] - dy_hat[i],2);
+				denom += Math.pow(dy[i] + dy_hat[i],2);
 			}
+			double diff = numer/denom;			
 			success = success & (diff < max_diff);
 
 			//------
 			//return results
 			if(!success){
-				System.out.print("dy   : ");
-				for(int i=0;i<Math.min(theta.length,10);i++)System.out.printf("%.3f ",output.dy[i]);
+				System.out.print("dy: ");
+				for(int i=0;i<Math.min(theta.length,10);i++)System.out.printf("%.3f ",dy[i]);
 				if(theta.length > 10)
 					System.out.println("...");
 				else
 					System.out.println("");
-				System.out.print("dy fd: ");
+				System.out.print("dh: ");
 				for(int i=0;i<Math.min(theta.length,10);i++)System.out.printf("%.3f ",dy_hat[i]);
 				if(theta.length > 10)
 					System.out.println("...");
@@ -65,62 +75,74 @@ public class ValidateGradient {
 		}
 		return success;
 	}
-
 	public static boolean validate(DifferentiableFunction2D f){
-		double delta = 0.01;
+	 return validate(f,new Random()); 
+	}
+	public static boolean validate(DifferentiableFunction2D f,Random rand){
+		double delta = 0.0001;
 		double max_diff = 0.0001;
-		int num_trials = 1000;		
-		Random rand = new Random();
+		int num_trials = 10;		
 		boolean success = true;
+    final double[] theta1 = f.getParams().clone();
+    double[] theta = f.getParams().clone();
+
+		
 		for(int trials=0;trials<num_trials;trials++){
 			Object input = f.generateRandomInput(rand);
-			double[] theta = f.getParams();
-			double[] theta1 = f.getParams().clone();
-			OutputAndGradient2D output = f.evaluate(input);
 
-			//compute empirical gradient
-			double[][] dy_hat = new double[output.dy.length][output.dy[0].length];
-			for(int i=0;i<dy_hat.length;i++)
-				Arrays.fill(dy_hat[i],0);
+			//compute analytic gradient
+			OutputAndGradient2D out = f.evaluate(input);
+			double[][] dy = new double[out.dy.length][out.dy[0].length];
+			for(int i=0;i<dy.length;i++)
+			  for(int j=0;j<dy[i].length;j++)
+			    if(out.logspace)
+			      dy[i][j] = Math.exp(out.dy[i][j]);
+			    else
+			      dy[i][j] = out.dy[i][j];
+			
+			//compute finite difference gradient
+			double[][] dh = new double[dy.length][dy[0].length];
+			for(int i=0;i<dh.length;i++) Arrays.fill(dh[i],0);			
 			
 			for(int tind=0;tind<theta.length;tind++){
 				//evaluate at theta[tind] += delta
 				theta[tind] = theta1[tind] + delta;
 				f.setParams(theta);
-				double[] y1 = f.evaluate(input).y;
+				double[] y1 = f.evaluate(input).y.clone();
 				//evaluate at theta[tind] -= delta
 				theta[tind] = theta1[tind] - delta;
 				f.setParams(theta);
-				double[] y2 = f.evaluate(input).y;
+				double[] y2 = f.evaluate(input).y.clone();
 				//check difference between errors
-
-				for(int aind=0;aind<dy_hat.length;aind++){
-					dy_hat[aind][tind] = (y1[aind]-y2[aind])/(2*delta);
+				for(int aind=0;aind<dh.length;aind++){
+					dh[aind][tind] = (y1[aind]-y2[aind])/(2*delta);
 				}
 				//reset
 				theta[tind] = theta1[tind];
 			}
 			//reset theta
-			f.setParams(theta1);
-			double diff = 0;
+			f.setParams(theta1);			
+			double numer=0,denom=0;
 			for(int i=0;i<theta.length;i++){
-				for(int aind=0;aind<dy_hat.length;aind++)			
-					diff += Math.abs(output.dy[aind][i] - dy_hat[aind][i]);
+				for(int aind=0;aind<dh.length;aind++){	
+					numer += Math.pow(dy[aind][i] - dh[aind][i],2);
+					denom += Math.pow(dy[aind][i] + dh[aind][i],2);
+				}
 			}
+			double diff = numer/denom;
 			success = success & (diff < max_diff);
-
 			//------
 			//return results
 			if(!success){
 				int max_show = 10;
 				//----------------
-				for(int q = 0; q<Math.min(2, dy_hat.length);q++){
+				for(int q = 0; q<Math.min(2, dh.length);q++){
 					int num_shown = 0;
 
 					for(int i=0;i<theta.length;i++){
-						if(output.dy[0][i] != dy_hat[0][i]){
+						if(dy[0][i] != dh[0][i]){
 							num_shown++;
-							System.out.printf("dy[%d]: %.3f ",i,output.dy[0][i]);
+							System.out.printf("dy[%d]: %.3f ",i,dy[q][i]);
 						}
 						if(num_shown >= max_show) break;
 					}
@@ -129,12 +151,12 @@ public class ValidateGradient {
 				}
 				System.out.println("..");
 				//----------------
-				for(int q = 0; q<Math.min(2, dy_hat.length);q++){
+				for(int q = 0; q<Math.min(2, dh.length);q++){
 					int num_shown = 0;
 					for(int i=0;i<theta.length;i++){
-						if(output.dy[0][i] != dy_hat[0][i]){
+						if(dy[0][i] != dh[0][i]){
 							num_shown++;
-							System.out.printf("dh[%d]: %.3f ",i,dy_hat[0][i]);
+							System.out.printf("dh[%d]: %.3f ",i,dh[q][i]);
 						}
 						if(num_shown >= max_show) break;
 					}
@@ -144,8 +166,7 @@ public class ValidateGradient {
 				System.out.println("..");
 				System.out.println("Difference: "+diff);
 				break;
-			}
-			
+			}			
 		}
 		return success;		
 	}

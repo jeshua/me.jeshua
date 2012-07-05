@@ -5,19 +5,19 @@ import java.util.Random;
 
 import jeshua.rl.Simulator;
 import jeshua.rl.State;
-import jeshua.rl.pgrd.DifferentiableRewardFunction.SASTriple;
+import jeshua.rl.pgrd.DifferentiableRFunction.SASTriple;
 import jeshua.rl.uct.UCT;
 import jeshua.rl.uct.UCTNodes.*;
 
-public class RewardDifferentiableUCT extends UCT implements DifferentiableQPlanner {
+public class RewardDifferentiableUCT extends UCT implements DifferentiableQFunction {
 
   protected double[][] gradQ;
   protected double[][] gradR;
   protected double[] gradQtmp;
   protected int numRewardFeatures;
-  protected DifferentiableRewardFunction diffRF;
+  protected DifferentiableRFunction diffRF;
 
-  public RewardDifferentiableUCT(Simulator sim, DifferentiableRewardFunction diffRF, 
+  public RewardDifferentiableUCT(Simulator sim, DifferentiableRFunction diffRF, 
 		  int trajectories, int depth, double gamma, Random random) {
     super(sim, trajectories, depth, gamma, random);
     this.diffRF = diffRF;
