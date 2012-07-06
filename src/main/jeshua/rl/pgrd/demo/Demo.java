@@ -14,10 +14,10 @@ public class Demo {
 	public static void main(String[] args) throws InterruptedException {
 		// real world
 		Random rand1 = new Random();
-		int sz = 6;
-		Maze maze = new Maze(Maze.randomMaze(sz, sz, rand1));   
-		maze.setCell(sz-1, sz-1, Maze.G);
-		DemoSim.maze = maze;
+	//	int sz = 15;
+//		Maze maze = new Maze(Maze.randomMaze(sz, sz, rand1));   
+		//maze.setCell(sz-1, sz-1, Maze.G);
+		//DemoSim.maze = maze;
 		DemoSim simReal = new DemoSim(rand1);
 		
 		// simulator for planning
@@ -25,8 +25,8 @@ public class Demo {
 		DemoSim simPlan = new DemoSim(rand2);
 		DemoRewardFunction rf = new DemoRewardFunction();
 				
-		int trajectories = 5;		
-		int depth = 1;
+		int trajectories = 50;		
+		int depth = 3;
 		double alpha = .001;
 		double temperature = .05;
 		double gamma = .95;
